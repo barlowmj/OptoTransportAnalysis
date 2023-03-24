@@ -1,0 +1,26 @@
+[project]
+name = "OptoTransportAnalysis"
+description = "Data analysis programs and infrastructure for use on optics and transport data in Xu lab @ UW"
+readme = {file = "README.md", contennt-type = "text/markdown"}
+license = {file = "LICENSE"}
+authors = [{name = "Jack Barlow", email = "barlowmj@uw.edu"}]
+requires-python = ">=3.8"
+dependencies = [
+    "pandas",
+    "pyyaml",
+    "scipy",
+    "matplotlib",
+    "h5py",
+    "numpy",
+    "imageio",
+    "ipykernel",
+    "sqlalchemy",
+    "flask-sqlalchemy",
+    "python-pptx",
+    "tkinter"
+]
+dynamic = ["version"]
+
+[project.urls]
+repository = "https://github.com/barlowmj/OptoTransportAnalysis"
+
