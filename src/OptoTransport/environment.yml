@@ -1,6 +1,7 @@
 name : OptoTransport
 channels:
   - conda-forge
+  - pypi
 dependencies:
   - python
   - pandas
@@ -14,5 +15,4 @@ dependencies:
   - sqlalchemy
   - flask-sqlalchemy
   - python-pptx
-  - tkinter
 

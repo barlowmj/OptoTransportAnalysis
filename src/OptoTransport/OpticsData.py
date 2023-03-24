@@ -10,3 +10,8 @@ class OpticsData(Data):
     def __init__(self, fn="", fn_md=""):
         super().__init__(filename=fn, filename_md=fn_md)
         return
+    
+def average_signal(dat):
+    assert type(dat) == OpticsData, "Input must be an OpticsData object"
+    avg = dat.data.iloc[:,0:-1].sum() / dat.metadata['num_frames']
+    return avg
