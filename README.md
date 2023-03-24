@@ -4,7 +4,7 @@ Data analysis infrastructure for work in Xu lab @ UW across optical and transpor
 Instructions for installing OptoTransport conda environment:\
 This repository contains an environment.yml file, which directs Conda 
 to establish an environment with all necessary packages to make this
-library work. You can install the environment using the following steps:
+library work. You can install the environment using the following steps: \
     1. Step into the directory where the environment.yml file is stored. \
     2. Create the environment using the line $ conda env create -f environment.yml \
     3. Activate the environment using $ conda activate OptoTransport \
