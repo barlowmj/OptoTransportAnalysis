@@ -1,6 +1,11 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["OptoTransportAnalysis*"]
+exclude = ["tests*"]
 
 [project]
 name = "OptoTransportAnalysis"
@@ -23,7 +28,7 @@ dependencies = [
     "ipykernel",
     "sqlalchemy",
     "flask-sqlalchemy",
-    "python-pptx",
+    "python-pptx"
 ]
 
 [project.urls]
