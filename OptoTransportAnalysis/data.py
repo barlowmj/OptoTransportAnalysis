@@ -21,6 +21,8 @@ class Data:
         else:
             self.filename = fd.askopenfilename(title="Please select the database file:",
                              initialdir='/Users/jackbarlow/Dropbox/Jack B/data')
+
+        assert(filename != ""), "File not selected"
         
         self.dir = os.path.dirname(self.filename)
         split_filename = os.path.splitext(self.filename)
