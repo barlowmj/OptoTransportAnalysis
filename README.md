@@ -24,7 +24,8 @@ Updating conda environments can be very slow. For faster performance, you can in
 In order to use the library/module from anywhere on your machine while using the `OptoTransport` environment, you need to install the package using pip while in this environment:
 1. Step into the highest level of the `OptoTransportAnalysis` package in your command line. This highest level should contain the `pyproj.toml` file, which communicates to the installer the details of the package.
 2. Activate the `OptoTransport` environment.
-3. Install the package to this environment by running `$ pip install --no-deps --editable .`, where `--no-deps` tells pip to not install the dependencies and `-e` allows the package to be updated as it continues to be worked on without having to re-install each time an edit is made.
-You can now import functions from this library using the statement `import OptoTransportAnalysis` when running a file in the `OptoTransport` conda environment! If you want to import the `OpticsData` and `TransportData` classes, use the statements `from OptoTransportAnalysis.opticsData import OpticsData` and `from OptoTransportAnalysis.transportData import TransportData`, respectively.
+3. Install the package to this environment by running `$ pip install --no-deps --editable . --config-settings editable_mode=strict`, where `--no-deps` tells pip to not install the dependencies and `-e` allows the package to be updated as it continues to be worked on without having to re-install each time an edit is made. The `--config-settings` prompt is a recommendation from Stack Exchange to make importing editable packages in VSCode less annoying (https://stackoverflow.com/questions/76213501/python-packages-imported-in-editable-mode-cant-be-resolved-by-pylance-in-vscode).
+You can now import functions and TransportData/OpticsData objects from this library using the statement `import OptoTransportAnalysis` when running a file in the `OptoTransport` conda environment!
 
 ### More info on packaging in `python`:
+Coming soon!
