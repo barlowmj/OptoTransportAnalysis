@@ -1,4 +1,8 @@
+from os import path
+from pandas import Series
+import string
 from .Data import Data
+
 
 class TransportData(Data):
     """
@@ -58,15 +62,17 @@ class TransportData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, fn=None, fn_md=None, in_dir=""):
+    def __init__(self, fn: path or string = None, fn_md: path or string = None,
+        in_dir: path or string = "") -> None:
         super().__init__(filename=fn, filename_md=fn_md, init_dir=in_dir)
         return
 
     #### Methods -------------------------------------------------------------
 
-    def get_RTcond_DilFridge(self, exp_name, start_time=0, warm=False):
+    def get_RTcond_DilFridge(self, exp_name: string, start_time: float = 0, 
+            warm: bool = False) -> Series[bool]:
         """
-        Returns a True/False condition for a RT curve from one of the 
+        Returns a Series of True/False conditions for a RT curve from one of the 
         dilution fridges to give a clean RT curve.
 
         Parameters
@@ -87,7 +93,7 @@ class TransportData(Data):
         Returns
         -------
 
-        less_than_all_prev : pandas Series of bools
+        less_than_all_prev : Series[bools]
             pandas Series containing boolean conditional values for 
             each point in given Series/DataFrame object (RT curve) such
             that, when plotted, the values corresponding to those which 
@@ -103,8 +109,9 @@ class TransportData(Data):
             less_than_all_prev = self.data[exp_name]["lakeshore_372_ch09_temperature"][start_time:] < self.data[exp_name]["lakeshore_372_ch09_temperature"][start_time:].cummin().shift().astype(float)
             return less_than_all_prev
 
-    def append_resistance_signal(self, exp_name, R_name, V_sig_name, 
-                                I_sig_name, gain=None, sensitivity=None):
+    def append_resistance_signal(self, exp_name: string, R_name: string, 
+            V_sig_name: string, I_sig_name: string, gain: float = None, 
+            sensitivity: float = None) -> None:
         """
         Appends a resistance signal to given data object.
 
@@ -144,8 +151,9 @@ class TransportData(Data):
         self.data[exp_name][R_name] = R_signal
         return
         
-    def append_MCA_coefficient(self, exp_name, MCA_name, R_2f_sig, R_f_sig, B_sig, 
-                               I_sig, gain=None, sensitivity=None):
+    def append_MCA_coefficient(self, exp_name: string, MCA_name: string, 
+            R_2f_sig: string, R_f_sig: string, B_sig: string or float, 
+            I_sig: string, gain: float = None, sensitivity: float = None) -> None:
         """
         Appends a series containing the non-reciprocal transport 
         coefficient γ to the given data. Can be computed as a function 
@@ -213,7 +221,7 @@ class TransportData(Data):
         self.data[exp_name][MCA_name] = MCA
         return
 
-    def append_symm_antisymm_rho(self, exp_name, R_sig):
+    def append_symm_antisymm_rho(self, exp_name: string, R_sig: string) -> None:
         """
         Appends the symmetrized and anti-symmetrized parts of a resistance
         signal to the given data.

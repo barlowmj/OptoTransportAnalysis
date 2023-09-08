@@ -1,3 +1,4 @@
+import string
 from tkinter import filedialog as fd
 import os
 import warnings
@@ -64,7 +65,8 @@ class Data:
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, filename=None, filename_md=None, init_dir=""):
+    def __init__(self, filename: os.path or string = None, 
+        filename_md: os.path or string = None, init_dir: os.path or string = "") -> None:
         """
         Constructor for Data class. 
         
@@ -135,7 +137,7 @@ class Data:
     #### Methods -------------------------------------------------------------
 
 
-    def __initData(self):
+    def __initData(self) -> None:
         """
         Initializes data from file from list of supported data types.
         """
@@ -154,7 +156,7 @@ class Data:
         return
 
 
-    def __initMetadata(self):
+    def __initMetadata(self) -> None:
         """
         Initializes metadata from file using list of supported file types. 
         """
@@ -173,7 +175,7 @@ class Data:
 
     ###### Initialization methods for specific file formats
 
-    def __initDataFromDB(self):
+    def __initDataFromDB(self) -> None:
         """
         Initializes data attribute from SQLite .db files using SQAlchemy
 
@@ -194,7 +196,7 @@ class Data:
         return
 
 
-    def __initDataFromCSV(self):
+    def __initDataFromCSV(self) -> None:
         """
         Initializes data attribute from .csv files by using the pandas.load_csv function
         """

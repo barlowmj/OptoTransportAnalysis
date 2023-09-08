@@ -1,3 +1,5 @@
+from os import path
+import string
 from .Data import Data
 
 class OpticsData(Data):
@@ -34,13 +36,14 @@ class OpticsData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, fn=None, fn_md=None, in_dir=""):
+    def __init__(self, fn: path or string = None, fn_md: path or string = None,
+        in_dir: path or string = "") -> None: 
         super().__init__(filename=fn, filename_md=fn_md, init_dir=in_dir)
         return
 
     #### Methods -------------------------------------------------------------
 
-    def add_average_signal(self):
+    def add_average_signal(self) -> None:
         """
         Adds an entry to the data attribute containing the average of all intensities.
         Does so without correcting for cosmic ray signals.
