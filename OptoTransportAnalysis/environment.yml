@@ -15,4 +15,5 @@ dependencies:
   - sqlalchemy
   - flask-sqlalchemy
   - python-pptx
+  - ipykernel
 
