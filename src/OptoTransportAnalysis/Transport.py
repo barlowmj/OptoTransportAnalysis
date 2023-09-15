@@ -70,7 +70,7 @@ class TransportData(Data):
     #### Methods -------------------------------------------------------------
 
     def get_RTcond_DilFridge(self, exp_name: string, start_time: float = 0, 
-            warm: bool = False) -> Series[bool]:
+            warm: bool = False):
         """
         Returns a Series of True/False conditions for a RT curve from one of the 
         dilution fridges to give a clean RT curve.

@@ -30,7 +30,7 @@ default_rcParams = {'axes.labelsize' : 14,
                     'savefig.format' : 'png',
                     'savefig.bbox' : 'tight',
                     'figure.dpi' : 225,
-                    'figure.figsize' : (8,6),
+                    'figure.figsize' : (6,4),
                     'xtick.labelsize' : 12,
                     'ytick.labelsize' : 12}
 
