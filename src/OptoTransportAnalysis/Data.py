@@ -126,7 +126,7 @@ class Data:
         
         # Raise warning if no metadata discovered at this point, create empty dict if so
         # Otherwise, initialize self.metadata, notify of successful loading
-        if self.filename_md == None:
+        if self.filename_md == None or self.filename_md == "":
             warnings.warn('No metadata file selected')
             self.metadata = {}
         else:

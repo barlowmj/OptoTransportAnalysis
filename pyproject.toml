@@ -3,9 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["OptoTransportAnalysis*"]
-exclude = ["tests*"]
 
 [project]
 name = "OptoTransportAnalysis"
