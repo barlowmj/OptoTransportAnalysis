@@ -94,6 +94,10 @@ def org_csv_by_frame(file):
     -------
     N/A
 
+    Notes
+    -----
+    Overwrites the .csv file -- be careful!
+
     """
     dat = OpticsData(file)
     num_frames = dat.data['Frame'].max()
@@ -102,7 +106,7 @@ def org_csv_by_frame(file):
     df['Wavelength'] = dat.data.loc[lambda df: df['Frame'] == 1]['Wavelength']
     for i in range(num_frames):
         df[f'Intensity_{i+1}'] = dat.data.loc[lambda df: df['Frame'] == (i+1)]['Intensity'].values
-    df.to_csv(file[:] + '_edit.csv')
+    df.to_csv(file)
     return
 
 def create_summary_slide(prs, fig_name, run_title=None, 
