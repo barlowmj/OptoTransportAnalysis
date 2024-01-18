@@ -46,9 +46,13 @@ class OpticsData(Data):
     def add_average_signal(self) -> None:
         """
         Adds an entry to the data attribute containing the average of all intensities.
-        Does so without correcting for cosmic ray signals.
+        Does so without correcting for cosmic rays.
         """
-        self.data['avg'] = self.data.iloc[:,0:-1].sum() / self.metadata['num_frames']
+        int_col_names = []
+        for col_name in self.data.columns:
+            if col_name.startswith('Intensity'):
+                int_col_names.append(col_name)
+        self.data['Average Intensity'] = self.data[int_col_names].sum(axis=1).values / self.metadata['num_frames']
         return
 
     
