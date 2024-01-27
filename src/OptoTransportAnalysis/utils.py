@@ -39,6 +39,25 @@ default_rcParams = {'axes.labelsize' : 14,
 
 #### Utility functions -------------------------------------------------------
 
+def dump_to_json_file(dict, filename):
+    """
+    Dump a dict into a .json file.
+
+    Parameters
+    ----------
+    dict : dict
+        Dict being written to .json file
+    
+    filename : str
+        Name of file to write to
+
+    Returns
+    -------
+    N/A
+    """
+    with open(filename, "w") as file:
+        json.dump(dict, file)
+    return
 
 def create_metadata_from_dict(dict_to_write, initial_dir=""):
     """
@@ -61,7 +80,6 @@ def create_metadata_from_dict(dict_to_write, initial_dir=""):
     Returns
     -------
     N/A
-
     """
     # Prompt user to select file with tkinter.filedialog GUI
     prompt_str = "Please select the file you wish to generate metadata for"
@@ -69,8 +87,8 @@ def create_metadata_from_dict(dict_to_write, initial_dir=""):
 
     # Solve for .json filename and dump to .json format
     filename_json = os.path.splitext(filename)[0] + '.json'
-    with open(filename_json, "w") as file:
-        json.dump(dict_to_write, file)
+    dump_to_json_file(filename_json, dict_to_write)
+    return
 
 
 def org_csv_by_frame(file):
@@ -97,7 +115,6 @@ def org_csv_by_frame(file):
     Notes
     -----
     Overwrites the .csv file -- be careful!
-
     """
     dat = OpticsData(file)
     num_frames = dat.data['Frame'].max()
@@ -162,7 +179,6 @@ def create_summary_slide(prs, fig_name, run_title=None,
     -----
     For more information on the python-pptx package, look to
     https://python-pptx.readthedocs.io/en/latest/index.html
-
     """
     # Create slide using blank layout option
     blank = prs.slide_layouts[6]
@@ -192,9 +208,9 @@ def create_summary_slide(prs, fig_name, run_title=None,
 
     return [slide, title, figure, comment]
 
-###### Plotting utility functions --------------------------------------------
+#### Plotting utility functions --------------------------------------------
 
-def label_H_x(ax):
+def label_uH_T_X(ax):
     """
     Names the x_label of a plot after the applied magnetic field in Tesla.
 
@@ -206,13 +222,12 @@ def label_H_x(ax):
     Returns
     -------
     N/A
-
     """
     ax.set_xlabel(r'μ_0H (T)')
     return
 
 
-def label_IDC_uA_x(ax):
+def label_IDC_uA_X(ax):
     """
     Names the x_label of a plot after the DC offset current in μA.
 
@@ -224,13 +239,12 @@ def label_IDC_uA_x(ax):
     Returns
     -------
     N/A
-    
     """
     ax.set_xlabel(r'I$_{DC}$ (μA)')
     return
 
 
-def label_photon_wavelength_nm_X(ax):
+def label_wavelength_nm_X(ax):
     """
     Names the x_label of a plot after the collection wavelength in nm.
 
@@ -242,13 +256,12 @@ def label_photon_wavelength_nm_X(ax):
     Returns
     -------
     N/A
-    
     """
     ax.set_xlabel(r'λ (nm)')
     return
 
 
-def label_photon_energy_eV_x(ax):
+def label_energy_eV_X(ax):
     """
     Names the x_label of a plot after the collection energy in eV.
 
@@ -260,7 +273,38 @@ def label_photon_energy_eV_x(ax):
     Returns
     -------
     N/A
-    
     """
     ax.set_xlabel(r'$\mathcal{E}$ (eV)')
+    return
+
+def label_int_counts_Y(ax):
+    """
+    Names the y_label of a plot after the intensity in counts.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the y-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'Intensity (Counts)')
+    return
+
+def label_int_au_Y(ax):
+    """
+    Names the y_label of a plot after the intensity in arbitrary units.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the y-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'Intensity (a.u.)')
     return
