@@ -50,13 +50,8 @@ class OpticsData(Data):
         Adds an entry to the data attribute containing the average of all intensities.
         Does so without correcting for cosmic rays.
         """
-        if num_frames == None:
-            num_frames = self.metadata['num_frames']
-
-        int_col_names = []
-        for col_name in self.data.columns:
-            if col_name.startswith('Intensity'):
-                int_col_names.append(col_name)
+        int_col_names = [names for names in self.data.columns if names.startswith('Intensity')]
+        num_frames = len(int_col_names)
         self.data['Average Intensity'] = self.data[int_col_names].sum(axis=1).values / num_frames
         return
 
