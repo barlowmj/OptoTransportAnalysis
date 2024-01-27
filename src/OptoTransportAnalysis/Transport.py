@@ -62,9 +62,10 @@ class TransportData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, fn: path or string = None, fn_md: path or string = None,
-        in_dir: path or string = "") -> None:
-        super().__init__(filename=fn, filename_md=fn_md, init_dir=in_dir)
+    def __init__(self, filename: path or string = None, filename_md: path or string = None,
+        init_dir: path or string = "", metadata_flag=True) -> None:
+        super().__init__(filename=filename, filename_md=filename_md, 
+                         init_dir=init_dir, metadata_flag=metadata_flag)
         return
 
     #### Methods -------------------------------------------------------------

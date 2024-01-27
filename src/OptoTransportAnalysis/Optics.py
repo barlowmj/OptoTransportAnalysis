@@ -12,7 +12,6 @@ class OpticsData(Data):
 
     Attributes
     ----------
-
     data : pandas DataFrame
         Inherited from Data class. Dataframe containing spectral data, 
         collection wavelength, and other relevant information.
@@ -26,9 +25,11 @@ class OpticsData(Data):
         Inherited from Data class. A reference to the file used to 
         initialize the data or metadata attributes (if given).
 
+    metadata_flag : bool
+
+
     Methods
     -------
-
     add_average_signal()
         Appends the average intensity of spectra contained in data to data.
     
@@ -36,9 +37,10 @@ class OpticsData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, fn: path or string = None, fn_md: path or string = None,
-        in_dir: path or string = "") -> None: 
-        super().__init__(filename=fn, filename_md=fn_md, init_dir=in_dir)
+    def __init__(self, filename: path or string = None, filename_md: path or string = None,
+        init_dir: path or string = "", metadata_flag = False) -> None: 
+        super().__init__(filename=filename, filename_md=filename_md, init_dir=init_dir, 
+                         metadata_flag=metadata_flag)
         return
 
     #### Methods -------------------------------------------------------------
@@ -50,7 +52,7 @@ class OpticsData(Data):
         """
         if num_frames == None:
             num_frames = self.metadata['num_frames']
-            
+
         int_col_names = []
         for col_name in self.data.columns:
             if col_name.startswith('Intensity'):

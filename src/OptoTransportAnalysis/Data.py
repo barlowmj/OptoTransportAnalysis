@@ -66,7 +66,8 @@ class Data:
     #### Constructor ---------------------------------------------------------
 
     def __init__(self, filename: os.path or string = None, 
-        filename_md: os.path or string = None, init_dir: os.path or string = "") -> None:
+        filename_md: os.path or string = None, init_dir: os.path or string = "",
+        metadata_flag = True) -> None:
         """
         Constructor for Data class. 
         
@@ -77,7 +78,6 @@ class Data:
 
         Parameters
         ----------
-
         filename, filename_md : path or path-like str, default = None
             Reference to a file used to initialize filename or filename_md
             attribute of Data class.
@@ -86,14 +86,16 @@ class Data:
             Reference to a file from which user can begin searching for 
             desired file through tkinter.filedialog GUI.
 
+        metadata_flag : bool, default = True
+            Bool to indicate if you want to skip metadata selection.
+
         Returns
         -------
-
         N/A
 
         """
         # Check if file given, otherwise prompt user to select file
-        if not filename==None:
+        if not filename == None:
             self.filename = filename
         else:
             prompt_str = "Please select data file: "
@@ -115,6 +117,8 @@ class Data:
             if (os.path.exists(split_filename[0] + '.json') 
                 and os.path.getsize(split_filename[0] + '.json') > 0):
                 self.filename_md = split_filename[0] + '.json'
+            elif metadata_flag == False:
+                self.filename_md = ""
             else:
                 prompt_str_md = "Please select metadata file: "
                 self.filename_md = fd.askopenfilename(title=prompt_str_md, 
@@ -131,7 +135,7 @@ class Data:
             self.metadata = {}
         else:
             self.__initMetadata()
-        print(f'Successfully loaded metadata from {self.filename_md}')
+            print(f'Successfully loaded metadata from {self.filename_md}')
 
 
     #### Methods -------------------------------------------------------------
@@ -172,6 +176,7 @@ class Data:
         else:
             warnings.warn('Unexpected potential error')
             return
+        
 
     ###### Initialization methods for specific file formats
 
