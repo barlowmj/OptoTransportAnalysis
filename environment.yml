@@ -16,4 +16,8 @@ dependencies:
   - flask-sqlalchemy
   - python-pptx
   - ipykernel
+  - ipython
+  - ipympl
+  - jupyterlab
+  - notebook
 
