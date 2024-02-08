@@ -1,11 +1,13 @@
 from tkinter import filedialog as fd
-import os
-import json
+from os import listdir
+from os.path import splitext
+from json import dump, load
 import pptx
 from pptx.util import Inches
 from cycler import cycler
-from .Optics import OpticsData
+from .Optics import OpticsData, defined_sum_cosine_windows
 from pandas import DataFrame
+from numpy import mean, zeros, array
 
 
 #### Utility variables -------------------------------------------------------
@@ -36,6 +38,8 @@ default_rcParams = {'axes.labelsize' : 14,
                     'xtick.labelsize' : 12,
                     'ytick.labelsize' : 12}
 
+defined_sum_cosine_windows_names = defined_sum_cosine_windows.keys()
+
 
 #### Utility functions -------------------------------------------------------
 
@@ -56,7 +60,7 @@ def dump_to_json_file(dict, filename):
     N/A
     """
     with open(filename, "w") as file:
-        json.dump(dict, file)
+        dump(dict, file)
     return
 
 def create_metadata_from_dict(dict_to_write, initial_dir=""):
@@ -86,7 +90,7 @@ def create_metadata_from_dict(dict_to_write, initial_dir=""):
     filename = fd.askopenfilename(title=prompt_str, initialdir=initial_dir)
 
     # Solve for .json filename and dump to .json format
-    filename_json = os.path.splitext(filename)[0] + '.json'
+    filename_json = splitext(filename)[0] + '.json'
     dump_to_json_file(filename_json, dict_to_write)
     return
 
@@ -208,6 +212,94 @@ def create_summary_slide(prs, fig_name, run_title=None,
 
     return [slide, title, figure, comment]
 
+def generate_list_data(dir_name) -> list:
+    """
+    """
+    dat = [OpticsData(dir_name+f) for f in listdir(dir_name) if f.endswith('.csv')]
+    return dat
+
+def generate_2d_spectrum(dats, key_name, offset=0) -> array:
+    """
+    Creates a 2-d numpy array from a collection of spectra.
+
+    Parameters
+    ----------
+    dats : list of OpticsData
+        List containing the spectra you wish to stitch
+
+    key_name : str
+        Name of the key for the data you wish to stitch, e.g., 'Average Intensity'
+        if you want to populate the array with the average intensities of the
+        data
+
+    offset : float
+        Value to add to all spectra
+
+    Returns
+    -------
+    spectrum : 2-d NumPy array
+        2-d array containing each of the spectra
+    """
+    spectrum  = zeros((len(dats), len(dats[0].data['Wavelength'])))
+    for i in range(len(dats)):
+        spectrum[i, :] = dats[i].data[key_name] + offset
+    return spectrum
+
+def generate_2d_dR(dats, key_name, background, subtract_mean = True) -> array:
+    """
+    Creates a 2-d numpy array from a collection of spectra.
+
+    Parameters
+    ----------
+    dats : list of OpticsData
+        List containing the spectra you wish to stitch
+
+    key_name : str
+        Name of the key for the data you wish to stitch, e.g., 'Average Intensity'
+        if you want to populate the array with the average intensities of the
+        data
+
+    background : OpticsData
+        OpticsData object containing the reference/background spectrum
+
+    Returns
+    -------
+    dR : 2-d NumPy array
+        2-d array containing each of the differential reflectance spectra
+    """
+    dR = zeros((len(dats), len(dats[0].data['Wavelength'])))
+    for i in range(len(dats)):
+        spec = dats[i].data[key_name].divide(dats[i].data[key_name] + background.data['Intensity'])
+        if subtract_mean:
+            dR[i, :] = spec - mean(spec)
+        else:
+            dR[i, :] = spec
+    return dR
+
+def generate_color_gradient(color1, color2, num_lines) -> list:
+    """
+    Generate a list of RBG tuples corresponding to the a color gradient between
+    color1 and color2. Used for generating a list of colors for plotting with
+    a gradient, e.g. from red to blue.
+
+    Parameters
+    ----------
+    color1, color2 : RGB 3-tuples
+        Colors you want to make a gradient between.
+
+    num_lines : int
+        Number of lines to plot.
+
+    Returns
+    -------
+    colors : list of RGB 3-tuples
+        List of colors from color1 to color2.
+    """
+    colors = [(color1[0] + i/num_lines*(color2[0] - color1[0]), 
+               color1[1] + i/num_lines*(color2[1] - color1[1]), 
+               color1[2] + i/num_lines*(color2[2] - color1[2])) for i in range(num_lines)]
+    return colors
+
 #### Plotting utility functions --------------------------------------------
 
 def label_uH_T_X(ax):
@@ -223,9 +315,24 @@ def label_uH_T_X(ax):
     -------
     N/A
     """
-    ax.set_xlabel(r'μ_0H (T)')
+    ax.set_xlabel(r'μ$_0$H (T)')
     return
 
+def label_uH_T_Y(ax):
+    """
+    Names the x_label of a plot after the applied magnetic field in Tesla.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the x-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'μ$_0$H (T)')
+    return
 
 def label_IDC_uA_X(ax):
     """
@@ -277,6 +384,66 @@ def label_energy_eV_X(ax):
     ax.set_xlabel(r'$\mathcal{E}$ (eV)')
     return
 
+def label_top_gate_V_X(ax):
+    """
+    Names the x_label of a plot after the top gate voltage in V.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the x-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_xlabel(r'V$_{\text{TG}}$ (V)')
+
+def label_back_gate_V_X(ax):
+    """
+    Names the x_label of a plot after the top gate voltage in V.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the x-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_xlabel(r'V$_{\text{BG}}$ (V)')
+
+def label_top_gate_V_Y(ax):
+    """
+    Names the x_label of a plot after the top gate voltage in V.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the x-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'V$_{\text{TG}}$ (V)')
+
+def label_back_gate_V_Y(ax):
+    """
+    Names the x_label of a plot after the top gate voltage in V.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the x-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'V$_{\text{BG}}$ (V)')
+
 def label_int_counts_Y(ax):
     """
     Names the y_label of a plot after the intensity in counts.
@@ -307,4 +474,20 @@ def label_int_au_Y(ax):
     N/A
     """
     ax.set_ylabel(r'Intensity (a.u.)')
+    return
+
+def label_dR_R_Y(ax):
+    """
+    Names the y_label of a plot after the intensity in arbitrary units.
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the y-axis of.
+
+    Returns
+    -------
+    N/A
+    """
+    ax.set_ylabel(r'ΔR/R')
     return
