@@ -146,15 +146,3 @@ class OpticsData(Data):
         assert('Average Intensity' in self.data.keys()), 'No \'Average Intensity\' data available'
         self.apply_sum_cosine_window('Average Intensity', window_name, cutoff, alpha0, alpha1, alpha2, alpha3, alpha4)
         return
-    
-    """
-    def apply_tunable_window(self, key_name, window_name, param1=0, param2=0, param3=0) -> None:
-        """
-        """
-        return
-    
-    def apply_chebyshev_window(self, key_name):
-        """
-        """
-        return
-    """

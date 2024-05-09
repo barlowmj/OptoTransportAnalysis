@@ -1,8 +1,12 @@
 from os import path
 from pandas import Series
 import string
+from numpy import array, append, transpose
 from .Data import Data
+from warnings import warn_explicit
 
+sweep_types = ["Keithley voltage", "PPMS DynaCool field", "PPMS DynaCool temp"]
+sweep_dirns = ["", "up", "down"]
 
 class TransportData(Data):
     """
@@ -62,8 +66,8 @@ class TransportData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, filename: path or string = None, filename_md: path or string = None,
-        init_dir: path or string = "", metadata_flag=True) -> None:
+    def __init__(self, filename: string = None, filename_md: string = None,
+        init_dir: string = "", metadata_flag=True) -> None:
         super().__init__(filename=filename, filename_md=filename_md, 
                          init_dir=init_dir, metadata_flag=metadata_flag)
         return
@@ -153,7 +157,7 @@ class TransportData(Data):
         return
         
     def append_MCA_coefficient(self, exp_name: string, MCA_name: string, 
-            R_2f_sig: string, R_f_sig: string, B_sig: string or float, 
+            R_2f_sig: string, R_f_sig: string, B_sig, 
             I_sig: string, gain: float = None, sensitivity: float = None) -> None:
         """
         Appends a series containing the non-reciprocal transport 
@@ -248,3 +252,110 @@ class TransportData(Data):
         self.data[exp_name][R_sig + "_symm"] = (self.data[exp_name][R_sig] + self.data[exp_name][R_sig].iloc[::-1]) / 2
         self.data[exp_name][R_sig + "_antisymm"] = (self.data[exp_name][R_sig] - self.data[exp_name][R_sig].iloc[::-1]) / 2
         return
+
+    def get_2d_sweep_params(self, outer_sweep_instr: string, outer_sweep_type: string, 
+                            inner_sweep_instr: string, inner_sweep_type: string,
+                            outer_dirn="", inner_dirn=""):
+        """
+        Get inner and outer sweep parameters for a 2D sweep constructed from 
+        many 1D sweeps in a single TransportData object.
+
+        Parameters
+        ----------
+        outer_sweep_instr, inner_sweep_instr : string
+            Name given to the outer/inner sweep instrument
+
+        outer_sweep_type, inner_sweep_type : string
+            Type of sweep performed. Must be in sweep_types
+
+        dirn : string, default = ""
+            Direction of sweep
+
+        Returns
+        -------
+        inner_param, outer_param : NDArray
+            1D arrays containing the values of the sweep parameters
+
+        sweep_ids : NDArray
+            1D array of ints giving the indicies of the inner_param sweeps in 
+            the TransportData object
+        """
+        assert(outer_sweep_type in sweep_types and inner_sweep_type in sweep_types), "Invalid sweep type(s)"
+        assert(outer_dirn in sweep_dirns and inner_dirn in sweep_dirns), "Invalid sweep direction(s)"
+
+        # Get outer parameter sweep values
+
+        if outer_sweep_type == "Keithley voltage":
+            init_exp_name = f'Keithley {outer_sweep_instr} voltage init'
+            exp_name = f'Keithley {outer_sweep_instr} voltage sweep'
+            if not outer_dirn == "":
+                exp_name = exp_name + ' ' + outer_dirn
+            unit = 'V'
+
+        elif outer_sweep_type == "PPMS DynaCool field":
+            init_exp_name = f'PPMS DynaCool {outer_sweep_instr} field init'
+            exp_name = f'PPMS DynaCool {outer_sweep_instr} field sweep'
+            if not outer_dirn == "":
+                exp_name = exp_name + ' ' + outer_dirn
+            unit = 'T'
+
+        elif outer_sweep_type == "PPMS DynaCool temp":
+            init_exp_name = f'PPMS DynaCool {outer_sweep_instr} temp init'
+            exp_name = f'PPMS DynaCool {outer_sweep_instr} temp sweep'
+            if not outer_dirn == "":
+                exp_name = exp_name + ' ' + outer_dirn
+            unit = 'K'
+        
+        init_val = None
+        for i in range(len(sweep_dirns)):
+            if i == 0:
+                try:
+                    init_val = float(self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == init_exp_name).dropna()[0].split(unit)[-2].split('to ')[1])
+                except KeyError:
+                    continue
+            else:
+                try:
+                    init_val = float(self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == init_exp_name + ' ' + sweep_dirns[i]).dropna()[0].split(unit)[-2].split('to ')[1])
+                except KeyError:
+                    continue
+        if init_val == None:
+            raise KeyError
+
+        outer_param = self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == exp_name).dropna()
+        outer_param = array([float(param.split(unit)[-2].split('to ')[1]) for param in outer_param])
+        outer_param = append(init_val, outer_param)
+
+        # Get sweep_ids corresponding to inner parameter sweeps
+
+        if inner_sweep_type == "Keithley voltage":
+            exp_name = f'Keithley {inner_sweep_instr} voltage sweep'
+            if not inner_dirn == "":
+                exp_name = exp_name + ' ' + inner_dirn
+
+        elif inner_sweep_type == "PPMS DynaCool field":
+            exp_name = f'PPMS DynaCool {inner_sweep_instr} field sweep'
+            if not inner_dirn == "":
+                exp_name = exp_name + ' ' + inner_dirn
+        
+        sweep_ids = self.data['experiments']['exp_id'].where(self.data['experiments']['name'] == exp_name).dropna().astype('int32').to_numpy()
+        
+        # Get inner parameter sweep values
+
+        inner_param = self.data[f'results-{sweep_ids[0]}-1'].index
+
+        return inner_param, outer_param, sweep_ids
+    
+    def get_2d_array_data(self, quantity: string, sweep_ids: array):
+        """
+        Get 2D numpy array containing values of a quantity as a function of two 
+        sweep parameters.
+
+        Parameters
+        ----------
+        quantity : string
+            String referring to the quantity being measured, e.g. Isd_X
+
+        sweep_ids : numpy.array
+            Array containing ids for parameter sweeps
+        """
+        return array([transpose(self.data[f'results-{id}-1'][quantity].to_numpy()) for id in sweep_ids])

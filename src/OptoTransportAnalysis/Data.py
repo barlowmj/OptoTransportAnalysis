@@ -65,8 +65,8 @@ class Data:
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, filename: os.path or string = None, 
-        filename_md: os.path or string = None, init_dir: os.path or string = "",
+    def __init__(self, filename : string = None, 
+        filename_md : string = None, init_dir : string = "",
         metadata_flag = True) -> None:
         """
         Constructor for Data class. 
@@ -188,16 +188,19 @@ class Data:
         specifically for .db files from  QCoDeS acquisition.
         """
         # Initialize connection to database with SQAlchemy, read experiments & runs
-        eng = sqlalchemy.create_engine(f'sqlite:///{self.filename}')
+        eng = sqlalchemy.create_engine(f'sqlite:///{self.filename}', pool_size=20, max_overflow=40)
+        conn = eng.connect()
         self.data = OrderedDict() 
-        self.data["experiments"] = pandas.read_sql('experiments', eng.connect())
-        self.data["runs"] = pandas.read_sql('runs', eng.connect())
+        self.data["experiments"] = pandas.read_sql('experiments', conn)
+        self.data["runs"] = pandas.read_sql('runs', conn)
 
         # eventually should try to correlate runs to corresponding experiment id? or something like that
         for ind, row in self.data["runs"].iterrows():
             run_params = row["parameters"].split(',')
             self.data[f'{row["result_table_name"]}'] = pandas.read_sql(f'{row["result_table_name"]}', 
-                                                    eng.connect()).groupby(run_params[0]).agg(numpy.nanmean)
+                                                    conn).groupby(run_params[0]).agg(numpy.nanmean)
+    
+        conn.close()
         return
 
 

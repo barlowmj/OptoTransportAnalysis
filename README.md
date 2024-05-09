@@ -9,7 +9,7 @@ This repository contains an `environment.yml` file, which directs conda to creat
 2. Create the environment by running `$ conda env create -f environment.yml`
 3. Activate the environment by running `$ conda activate OptoTransport`
 
-More info on conda and activating environments:
+More info on conda and activating environments:-
 * Installing conda: https://learning.anaconda.cloud/?utm_campaign=starter-mktg&utm_medium=online-advertising&utm_source=google&gclid=CjwKCAiA-dCcBhBQEiwAeWidtVqZ-CXpReEyQC5J6LUkmnVll_6RWkciK_s15SbfN0mTBgxQ5lMuPRoCn3AQAvD_BwE
 * Activating environments using .yml files: https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 

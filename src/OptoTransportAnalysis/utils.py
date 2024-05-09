@@ -40,6 +40,10 @@ default_rcParams = {'axes.labelsize' : 14,
 
 defined_sum_cosine_windows_names = defined_sum_cosine_windows.keys()
 
+# Useful colors
+matlab_red = (0.6350, 0.0780, 0.1840)
+matlab_blue = (0, 0.4470, 0.7410)
+
 
 #### Utility functions -------------------------------------------------------
 
@@ -347,7 +351,7 @@ def label_IDC_uA_X(ax):
     -------
     N/A
     """
-    ax.set_xlabel(r'I$_{DC}$ (μA)')
+    ax.set_xlabel(r'I$_{\text{DC}}$ (μA)')
     return
 
 
