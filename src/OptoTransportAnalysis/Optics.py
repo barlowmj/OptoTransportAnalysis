@@ -5,7 +5,7 @@ from scipy.constants import speed_of_light, Planck, electron_volt, pi
 from scipy.fft import rfft, irfft
 from scipy.signal import convolve
 from scipy.special import chebyt
-from numpy import array, cos, sum
+from numpy import array, cos, sum, gradient, mean
 
 global defined_sum_cosine_windows
 defined_sum_cosine_windows = {'Hann' : [0.5, 0.5, 0, 0, 0], 
@@ -53,8 +53,8 @@ class OpticsData(Data):
 
     #### Constructor ---------------------------------------------------------
 
-    def __init__(self, filename: path or string = None, filename_md: path or string = None,
-        init_dir: path or string = "", metadata_flag = False) -> None: 
+    def __init__(self, filename: string = None, filename_md: string = None,
+        init_dir: string = "", metadata_flag = False) -> None: 
         super().__init__(filename=filename, filename_md=filename_md, init_dir=init_dir, 
                          metadata_flag=metadata_flag)
         return
@@ -145,4 +145,23 @@ class OpticsData(Data):
         """
         assert('Average Intensity' in self.data.keys()), 'No \'Average Intensity\' data available'
         self.apply_sum_cosine_window('Average Intensity', window_name, cutoff, alpha0, alpha1, alpha2, alpha3, alpha4)
+        return
+    
+    def compute_gradient(self, key_name) -> None:
+        """
+        Computes the gradient of the signal along the independent axis direction.
+        """
+        assert(key_name in self.data.keys()), 'Selected key not valid'
+        self.data[f'Grad {key_name}'] = gradient(self.data[f'{key_name}'])
+        return
+    
+    def compute_dR(self, key_name, background, subtract_mean = True) -> None:
+        """
+        Computes dR/R of the signal with respect to a given background.
+        """
+        spec = self.data[key_name].divide(self.data[key_name] + background.data['Intensity'])
+        if subtract_mean:
+            self.data[f'dR/R {key_name}'] = spec - mean(spec)
+        else:
+            self.data[f'dR/R {key_name}'] = spec
         return

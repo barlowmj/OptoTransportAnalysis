@@ -495,3 +495,19 @@ def label_dR_R_Y(ax):
     """
     ax.set_ylabel(r'ΔR/R')
     return
+
+def label_T_K_X(ax):
+    """
+    Names the x_label of a plot after the temperature in Kelvin (K).
+
+    Parameters
+    ----------
+    ax : Axes
+        Axes object you wish to label the y-axis of.
+
+    Returns
+    -------
+    N/A   
+    """
+    ax.set_xlabel(r'T (K)')
+    return
