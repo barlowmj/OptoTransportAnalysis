@@ -5,7 +5,7 @@ from numpy import array, append, transpose
 from .Data import Data
 from warnings import warn_explicit
 
-sweep_types = ["Keithley voltage", "PPMS DynaCool field", "PPMS DynaCool temp"]
+sweep_types = ["Keithley voltage", "PPMS DynaCool field", "PPMS DynaCool temp", "Keithley current", "AMI430 field"]
 sweep_dirns = ["", "up", "down"]
 
 class TransportData(Data):
@@ -305,21 +305,19 @@ class TransportData(Data):
             if not outer_dirn == "":
                 exp_name = exp_name + ' ' + outer_dirn
             unit = 'K'
+
+        elif outer_sweep_type == "AMI430 field":
+            init_exp_name = f"AMI430 {outer_sweep_instr} field init"
+            exp_name = f"AMI430 {outer_sweep_instr} field sweep"
+            if not outer_dirn == "":
+                exp_name = exp_name + ' ' + outer_dirn
+            unit = "T"
         
         init_val = None
-        for i in range(len(sweep_dirns)):
-            if i == 0:
-                try:
-                    init_val = float(self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == init_exp_name).dropna()[0].split(unit)[-2].split('to ')[1])
-                except KeyError:
-                    continue
-            else:
-                try:
-                    init_val = float(self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == init_exp_name + ' ' + sweep_dirns[i]).dropna()[0].split(unit)[-2].split('to ')[1])
-                except KeyError:
-                    continue
-        if init_val == None:
-            raise KeyError
+        try:
+            init_val = float(self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == init_exp_name).dropna().iloc[0].split(unit)[-2].split('to ')[1])
+        except KeyError:
+            Warning("Something wrong with Key given to Series objects...")
 
         outer_param = self.data['experiments']['sample_name'].where(self.data['experiments']['name'] == exp_name).dropna()
         outer_param = array([float(param.split(unit)[-2].split('to ')[1]) for param in outer_param])
@@ -336,6 +334,11 @@ class TransportData(Data):
             exp_name = f'PPMS DynaCool {inner_sweep_instr} field sweep'
             if not inner_dirn == "":
                 exp_name = exp_name + ' ' + inner_dirn
+
+        elif inner_sweep_type == "Keithley current":
+            exp_name = f"Keithley {inner_sweep_instr} current sweep"
+            if not inner_dirn == "":
+                exp_name = exp_name + ' '  + inner_dirn
         
         sweep_ids = self.data['experiments']['exp_id'].where(self.data['experiments']['name'] == exp_name).dropna().astype('int32').to_numpy()
         
